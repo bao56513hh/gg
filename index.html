@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>gg)</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        #messages { list-style-type: none; padding: 0; margin-bottom: 10px; border: 1px solid #ccc; padding: 10px; height: 200px; overflow-y: auto; }
+        #input-area { display: flex; }
+        #message-input { flex-grow: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px 0 0 5px; }
+        #send-button { padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 0 5px 5px 0; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>budaicho</h1>
+    <ul id="messages"></ul>
+    <div id="input-area">
+        <input type="text" id="message-input" placeholder="Nhập tin nhắn...">
+        <button id="send-button">Gửi</button>
+    </div>
+
+    <script>
+        const messagesElement = document.getElementById('messages');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const STORAGE_KEY = 'simpleChatMessages';
+
+        function displayMessages() {
+            const storedMessages = localStorage.getItem(STORAGE_KEY);
+            messagesElement.innerHTML = '';
+            if (storedMessages) {
+                const messages = JSON.parse(storedMessages);
+                messages.forEach(msg => {
+                    const li = document.createElement('li');
+                    li.textContent = msg;
+                    messagesElement.appendChild(li);
+                });
+                messagesElement.scrollTop = messagesElement.scrollHeight;
+            }
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                let storedMessages = localStorage.getItem(STORAGE_KEY);
+                let messagesArray = storedMessages ? JSON.parse(storedMessages) : [];
+                messagesArray.push(message);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(messagesArray));
+                messageInput.value = '';
+                displayMessages();
+                window.dispatchEvent(new Event('storage'));
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        window.addEventListener('storage', displayMessages);
+
+        displayMessages();
+    </script>
+</body>
+</html>
